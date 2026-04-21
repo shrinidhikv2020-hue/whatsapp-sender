@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WhatsApp Quick Sender</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 420px;
+      margin: 60px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    button {
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: darkgreen;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>WhatsApp Quick Sender</h2>
+
+  <input id="phone" placeholder="Phone number with country code (e.g. 91xxxxxxxxxx)" />
+
+  <textarea id="message" rows="5" placeholder="Type your message"></textarea>
+
+  <button onclick="sendMessage()">Open WhatsApp</button>
+
+  <script>
+    function sendMessage() {
+      const phone = document.getElementById("phone").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!phone || !message) {
+        alert("Please enter both phone number and message.");
+        return;
+      }
+
+      const encoded = encodeURIComponent(message);
+      const url = `https://wa.me/${phone}?text=${encoded}`;
+
+      window.open(url, "_blank");
+    }
+  </script>
+
+</body>
+</html>
