@@ -1,59 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>WhatsApp Quick Sender</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 420px;
-      margin: 60px auto;
-      padding: 20px;
-      text-align: center;
-    }
-    input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    button {
-      background: green;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: darkgreen;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>WhatsApp Sender Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+  }
+
+  input, textarea, button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    font-size: 16px;
+  }
+
+  button {
+    background: #25D366;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  button:hover {
+    background: #1da851;
+  }
+
+  .small {
+    font-size: 12px;
+    color: gray;
+  }
+</style>
 </head>
+
 <body>
 
-  <h2>WhatsApp Quick Sender</h2>
+<h2>WhatsApp Sender Pro</h2>
 
-  <input id="phone" placeholder="Phone number with country code (e.g. 91xxxxxxxxxx)" />
+<input id="phone" placeholder="Phone (e.g. 91XXXXXXXXXX)" />
+<textarea id="message" rows="5" placeholder="Type your message"></textarea>
 
-  <textarea id="message" rows="5" placeholder="Type your message"></textarea>
+<button onclick="sendMsg()">Send via WhatsApp</button>
 
-  <button onclick="sendMessage()">Open WhatsApp</button>
+<p class="small">Tip: include country code without + or spaces</p>
 
-  <script>
-    function sendMessage() {
-      const phone = document.getElementById("phone").value.trim();
-      const message = document.getElementById("message").value.trim();
+<script>
+function cleanPhone(phone) {
+  return phone.replace(/\D/g, ""); // remove +, spaces, dashes
+}
 
-      if (!phone || !message) {
-        alert("Please enter both phone number and message.");
-        return;
-      }
+function sendMsg() {
+  let phone = document.getElementById("phone").value;
+  let message = document.getElementById("message").value;
 
-      const encoded = encodeURIComponent(message);
-      const url = `https://wa.me/${phone}?text=${encoded}`;
+  phone = cleanPhone(phone);
 
-      window.open(url, "_blank");
-    }
-  </script>
+  if (!phone || phone.length < 10) {
+    alert("Invalid phone number. Include country code.");
+    return;
+  }
+
+  if (!message.trim()) {
+    alert("Please enter a message.");
+    return;
+  }
+
+  const encoded = encodeURIComponent(message);
+
+  // More reliable endpoint for WhatsApp Web
+  const url = `https://web.whatsapp.com/send?phone=${phone}&text=${encoded}`;
+
+  const win = window.open(url, "_blank");
+
+  // Fallback if popup blocked or fails
+  if (!win) {
+    alert("Popup blocked. Copying message instead.");
+
+    navigator.clipboard.writeText(message);
+
+    alert("Message copied. Paste it in WhatsApp manually.");
+  }
+}
+</script>
 
 </body>
 </html>
