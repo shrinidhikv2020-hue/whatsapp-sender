@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>WhatsApp Sender Pro</title>
+<title>WhatsApp Bulk Sender</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <style>
   body {
-    font-family: Arial, sans-serif;
-    max-width: 420px;
+    font-family: Arial;
+    max-width: 500px;
     margin: 40px auto;
     padding: 20px;
     text-align: center;
   }
 
-  input, textarea, button {
+  textarea, input, button {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
@@ -33,7 +33,7 @@
     background: #1da851;
   }
 
-  .small {
+  .hint {
     font-size: 12px;
     color: gray;
   }
@@ -42,51 +42,53 @@
 
 <body>
 
-<h2>WhatsApp Sender Pro</h2>
+<h2>WhatsApp Bulk Sender</h2>
 
-<input id="phone" placeholder="Phone (e.g. 91XXXXXXXXXX)" />
-<textarea id="message" rows="5" placeholder="Type your message"></textarea>
+<textarea id="numbers" rows="6" placeholder="Enter numbers (one per line)
+Example:
+919876543210
+918888888888"></textarea>
 
-<button onclick="sendMsg()">Send via WhatsApp</button>
+<textarea id="message" rows="5" placeholder="Enter message"></textarea>
 
-<p class="small">Tip: include country code without + or spaces</p>
+<input id="delay" type="number" placeholder="Delay in seconds (e.g. 5)" value="3"/>
+
+<button onclick="sendBulk()">Start Bulk Send</button>
+
+<p class="hint">Opens each chat one-by-one in WhatsApp Web</p>
 
 <script>
 function cleanPhone(phone) {
-  return phone.replace(/\D/g, ""); // remove +, spaces, dashes
+  return phone.replace(/\D/g, "");
 }
 
-function sendMsg() {
-  let phone = document.getElementById("phone").value;
-  let message = document.getElementById("message").value;
-
-  phone = cleanPhone(phone);
-
-  if (!phone || phone.length < 10) {
-    alert("Invalid phone number. Include country code.");
-    return;
-  }
-
-  if (!message.trim()) {
-    alert("Please enter a message.");
-    return;
-  }
-
+function openWhatsApp(phone, message) {
   const encoded = encodeURIComponent(message);
-
-  // More reliable endpoint for WhatsApp Web
   const url = `https://web.whatsapp.com/send?phone=${phone}&text=${encoded}`;
+  window.open(url, "_blank");
+}
 
-  const win = window.open(url, "_blank");
+async function sendBulk() {
+  let numbers = document.getElementById("numbers").value.trim().split("\n");
+  let message = document.getElementById("message").value.trim();
+  let delay = parseInt(document.getElementById("delay").value) || 3;
 
-  // Fallback if popup blocked or fails
-  if (!win) {
-    alert("Popup blocked. Copying message instead.");
-
-    navigator.clipboard.writeText(message);
-
-    alert("Message copied. Paste it in WhatsApp manually.");
+  if (!numbers.length || !message) {
+    alert("Enter numbers and message");
+    return;
   }
+
+  for (let i = 0; i < numbers.length; i++) {
+    let phone = cleanPhone(numbers[i]);
+
+    if (phone.length < 10) continue;
+
+    openWhatsApp(phone, message);
+
+    await new Promise(r => setTimeout(r, delay * 1000));
+  }
+
+  alert("Bulk process started. Check WhatsApp tabs.");
 }
 </script>
 
